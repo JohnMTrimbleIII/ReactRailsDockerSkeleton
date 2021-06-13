@@ -1,0 +1,36 @@
+  
+version: '3'
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ENTER_PSQL_PASS
+  backend:
+    container_name: backend
+    build: ./backend
+    volumes:
+      - ./backend:/myapp/backend
+    ports:
+      - "1234:1234"
+      - "3001:3001"
+      - "26162:26162"
+    depends_on:
+      - db
+  frontend:
+    tty: true
+    environment:
+      REACT_APP_GRAPHQL_URL: http://localhost:3001/graphql
+      REACT_APP_API_URL: http://localhost:3001/api
+      REACT_APP_URL: http://localhost:3001
+    container_name: frontend
+    image: "node:14-alpine"
+    user: "node"
+    working_dir: /myapp/frontend
+    volumes:
+      - ./frontend:/myapp/frontend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - backend
