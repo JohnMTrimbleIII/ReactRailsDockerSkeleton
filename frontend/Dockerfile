@@ -1,21 +1,15 @@
-# You should always specify a full version here to ensure all of your developers
-# are running the same version of Node.
-FROM node:current-alpine3.13
 
-# Override the base log level (info).
-ENV NPM_CONFIG_LOGLEVEL warn
+FROM node:10
+WORKDIR /app
 
-# Install and configure `serve`.
-RUN yarn global add serve
-CMD serve -s build
-EXPOSE 5000
+COPY package.json ./
 
-# Install all dependencies of the current project.
-COPY package.json package.json
-RUN yarn
+COPY yarn.lock ./
 
-# Copy all local files into the image.
+RUN yarn install --frozen-lockfile
+
 COPY . .
 
-# Build for production.
-#RUN yarn run build --production
+EXPOSE 3000
+
+CMD ["npm", "start"]
